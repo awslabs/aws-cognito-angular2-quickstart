@@ -38,19 +38,26 @@ export class CognitoUtil {
         ClientId: CognitoUtil._CLIENT_ID
     };
 
+    private currentUser;
+    private userPool;
 
     public static getAwsCognito(): any {
         return AWSCognito
     }
 
     getUserPool() {
-        return new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(CognitoUtil._POOL_DATA);
+        if (!this.userPool) {
+            this.userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(CognitoUtil._POOL_DATA);
+        }
+        return this.userPool;
     }
 
     getCurrentUser() {
-        return this.getUserPool().getCurrentUser();
+        if (!this.currentUser) {
+            this.currentUser = this.getUserPool().getCurrentUser();
+        }
+        return this.currentUser;
     }
-
 
     getCognitoIdentity(): string {
         return AWS.config.credentials.identityId;
