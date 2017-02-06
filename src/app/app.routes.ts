@@ -5,12 +5,12 @@ import {SecureHomeComponent} from "./secure/landing/securehome.component";
 import {MyProfileComponent} from "./secure/profile/myprofile.component";
 import {JwtComponent} from "./secure/jwttokens/jwt.component";
 import {UseractivityComponent} from "./secure/useractivity/useractivity.component";
-import {AppComponent} from "./app.component";
 import {LoginComponent} from "./public/auth/login/login.component";
 import {RegisterComponent} from "./public/auth/register/registration.component";
 import {ForgotPassword2Component, ForgotPasswordStep1Component} from "./public/auth/forgot/forgotPassword.component";
 import {RegistrationConfirmationComponent, LogoutComponent} from "./public/auth/confirm/confirmRegistration.component";
 import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
+import {RootComponent} from "./root/root.component";
 
 const homeRoutes: Routes = [
     {
@@ -54,7 +54,7 @@ const secureHomeRoutes: Routes = [
 const routes: Routes = [
     {
         path: '',
-        component: AppComponent,
+        component: RootComponent,
         children: [
             ...homeRoutes,
             ...secureHomeRoutes,
