@@ -19,7 +19,7 @@ import {RegisterComponent} from "./public/auth/register/registration.component";
 import {ForgotPasswordStep1Component, ForgotPassword2Component} from "./public/auth/forgot/forgotPassword.component";
 import {LogoutComponent, RegistrationConfirmationComponent} from "./public/auth/confirm/confirmRegistration.component";
 import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
-
+import {RootComponent} from "./root/root.component";
 
 @NgModule({
     declarations: [
@@ -37,6 +37,7 @@ import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
         MyProfileComponent,
         SecureHomeComponent,
         JwtComponent,
+        RootComponent,
         AppComponent
     ],
     imports: [
