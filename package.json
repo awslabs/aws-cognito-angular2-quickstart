@@ -2,8 +2,9 @@
   "name": "aws-cognito-angular2-quickstart",
   "author": "Vladimir Budilov",
   "version": "1.0.0",
+  "angular-cli": {},
   "scripts": {
-    "start": "ng serve",
+    "start": "ng serve --port 3333",
     "startnode": "node ./bin/www",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
