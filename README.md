@@ -48,9 +48,14 @@ while Elastic Beanstalk gives you the capability of adding backend operations to
 * [What is Elastic Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html)
 * [What is S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/Welcome.html)
 
+
+
 ```
 # Install the AWS resources and deploy your application to either Elastic Beanstalk or S3
 cd aws
+
+# Default destination region is us-west-2
+# to use a different region edit the REGION var in createResources.sh
 ./createResources.sh
 ```
 
