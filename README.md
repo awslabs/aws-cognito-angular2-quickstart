@@ -80,5 +80,5 @@ npm run build; cd dist; aws s3 sync . s3://[BUCKET_NAME]/
 ```
 ```
 # Test your deployed application
-curl –I http://[BUCKET_NAME].s3-website-[REGION].amazonaws.com/
+curl –I http://[BUCKET_NAME].s3-website.[REGION].amazonaws.com/
 ```
