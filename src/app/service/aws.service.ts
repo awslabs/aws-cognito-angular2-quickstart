@@ -1,21 +1,53 @@
 import {Injectable} from "@angular/core";
 import {CognitoUtil, Callback} from "./cognito.service";
+import * as AWS from "aws-sdk/global";
+import * as CognitoIdentity from "aws-sdk/clients/cognitoidentity";
 
 /**
  * Created by Vladimir Budilov
  */
 
-
-declare var AWS: any;
-declare var AMA: any;
+// declare var AMA: any;
 
 @Injectable()
 export class AwsUtil {
     public static firstLogin: boolean = false;
     public static runningInit: boolean = false;
 
+    public cognitoCreds:AWS.CognitoIdentityCredentials;
+
     constructor() {
         AWS.config.region = CognitoUtil._REGION;
+    }
+
+    // AWS Stores Credentials in many ways, and with TypeScript this means that 
+    // getting the base credentials we authenticated with from the AWS globals gets really murky,
+    // having to get around both class extension and unions. Therefore, we're going to give
+    // developers direct access to the raw, unadulterated CognitoIdentityCredentials
+    // object at all times.
+    setCognitoCreds(creds:AWS.CognitoIdentityCredentials) {
+        this.cognitoCreds = creds;
+    }
+
+    getCognitoCreds(){
+        return this.cognitoCreds;
+    }
+
+    // This method takes in a raw jwtToken and uses the global AWS config options to build a
+    // CognitoIdentityCredentials object and store it for us. It also returns the object to the caller
+    // to avoid unnecessary calls to setCognitoCreds.
+
+    buildCognitoCreds(idTokenJwt:string) {
+        let url = 'cognito-idp.' + CognitoUtil._REGION.toLowerCase() + '.amazonaws.com/' + CognitoUtil._USER_POOL_ID;
+        let logins:CognitoIdentity.LoginsMap = {};
+        logins[url] = idTokenJwt;
+        let params = {
+            IdentityPoolId: CognitoUtil._IDENTITY_POOL_ID, /* required */
+            Logins: logins
+        };
+        let creds = new AWS.CognitoIdentityCredentials(params);
+        this.setCognitoCreds(creds);
+        return creds;
     }
 
     /**
@@ -63,8 +95,9 @@ export class AwsUtil {
                 appTitle: "aws-cognito-angular2-quickstart"
             };
 
-            var mobileAnalyticsClient = new AMA.Manager(options);
-            mobileAnalyticsClient.submitEvents();
+            // TODO: The mobile Analytics client needs some work to handle Typescript. Disabling for the time being.
+            // var mobileAnalyticsClient = new AMA.Manager(options);
+            // mobileAnalyticsClient.submitEvents();
 
             this.addCognitoCredentials(idToken);
 
@@ -84,13 +117,12 @@ export class AwsUtil {
     }
 
     addCognitoCredentials(idTokenJwt: string): void {
-        let params = AwsUtil.getCognitoParametersForIdConsolidation(idTokenJwt);
+        let creds = this.buildCognitoCreds(idTokenJwt);
 
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials(params);
+        AWS.config.credentials = creds;
 
-        AWS.config.credentials.get(function (err) {
+        creds.get(function (err) {
             if (!err) {
-                // var id = AWS.config.credentials.identityId;
                 if (AwsUtil.firstLogin) {
                     // save the login info to DDB
                     this.ddb.writeLogEntry("login");
