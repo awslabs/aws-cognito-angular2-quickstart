@@ -1,5 +1,5 @@
 import {environment} from "../../environments/environment";
-import {CognitoUtil} from "./cognito.service";
+import {CognitoSessionService} from "./cognito-session.service";
 import * as AWS from "aws-sdk/global";
 import * as S3 from "aws-sdk/clients/s3";
 
@@ -10,7 +10,7 @@ import * as S3 from "aws-sdk/clients/s3";
 
 export class S3Service {
 
-    constructor(public cognitoUtil: CognitoUtil) {
+    constructor(public cognitoSession: CognitoSessionService) {
 
     }
 
@@ -29,28 +29,32 @@ export class S3Service {
     }
 
     public addPhoto(selectedFile): boolean {
+        
         if (!selectedFile) {
             console.log('Please choose a file to upload first.');
             return;
         }
-        let fileName = selectedFile.name;
-        let albumPhotosKey = environment.albumName + '/' + this.cognitoUtil.getCognitoIdentity() + "/";
-        let photoKey = albumPhotosKey + fileName;
+        this.cognitoSession.getCreds().then( (creds:AWS.CognitoIdentityCredentials) => {
+            let fileName = selectedFile.name;
+            let albumPhotosKey = environment.albumName + '/' + creds.identityId + "/";
+            let photoKey = albumPhotosKey + fileName;
 
-        this.getS3().upload({
-            Key: photoKey,
-            ContentType: selectedFile.type,
-            Body: selectedFile,
-            StorageClass: 'STANDARD',
-            ACL: 'private'
-        }, function (err, data) {
-            if (err) {
-                console.log('There was an error uploading your photo: ', err);
-                return false;
-            }
-            console.log('Successfully uploaded photo.');
-            return true;
-        });
+            this.getS3().upload({
+                Key: photoKey,
+                ContentType: selectedFile.type,
+                Body: selectedFile,
+                StorageClass: 'STANDARD',
+                ACL: 'private'
+            }, function (err, data) {
+                if (err) {
+                    console.log('There was an error uploading your photo: ', err);
+                    return false;
+                }
+                console.log('Successfully uploaded photo.');
+                return true;
+            });
+        })
+
     }
 
     public deletePhoto(albumName, photoKey) {

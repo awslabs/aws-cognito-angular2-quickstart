@@ -1,14 +1,15 @@
 import {Injectable} from "@angular/core";
 import {DynamoDBService} from "./ddb.service";
-import {CognitoCallback, CognitoUtil, LoggedInCallback} from "./cognito.service";
+import {CognitoCallback, LoggedInCallback} from "./cognito.service";
 import {AuthenticationDetails, CognitoUser} from "amazon-cognito-identity-js";
+import {CognitoSessionService} from "./cognito-session.service";
 import * as AWS from "aws-sdk/global";
 import * as STS from "aws-sdk/clients/sts";
 
 @Injectable()
 export class UserLoginService {
 
-    constructor(public ddb: DynamoDBService, public cognitoUtil: CognitoUtil) {
+    constructor(public ddb: DynamoDBService, public cognitoSession: CognitoSessionService) {
     }
 
     authenticate(username: string, password: string, callback: CognitoCallback) {
@@ -22,7 +23,7 @@ export class UserLoginService {
 
         let userData = {
             Username: username,
-            Pool: this.cognitoUtil.getUserPool()
+            Pool: this.cognitoSession.cognitoUserPool
         };
 
         console.log("UserLoginService: Params set...Authenticating the user");
@@ -35,22 +36,9 @@ export class UserLoginService {
             },
             onSuccess: function (result) {
 
-                console.log("In authenticateUser onSuccess callback");
+                console.log("UserLoginService: authenticate: Authentication successful, creating session...");
 
-                let creds = self.cognitoUtil.buildCognitoCreds(result.getIdToken().getJwtToken());
-
-                AWS.config.credentials = creds;
-
-                // So, when CognitoIdentity authenticates a user, it doesn't actually hand us the IdentityID,
-                // used by many of our other handlers. This is handled by some sly underhanded calls to AWS Cognito
-                // API's by the SDK itself, automatically when the first AWS SDK request is made that requires our
-                // security credentials. The identity is then injected directly into the credentials object.
-                // If the first SDK call we make wants to use our IdentityID, we have a
-                // chicken and egg problem on our hands. We resolve this problem by "priming" the AWS SDK by calling a
-                // very innocuous API call that forces this behavior.
-                let sts = new STS();
-                sts.getCallerIdentity(function (err, data) {
-                    console.log("UserLoginService: Successfully set the AWS credentials");
+                self.cognitoSession.initSession(cognitoUser).then(function(result) {
                     callback.cognitoCallback(null, result);
                 });
 
@@ -64,7 +52,7 @@ export class UserLoginService {
     forgotPassword(username: string, callback: CognitoCallback) {
         let userData = {
             Username: username,
-            Pool: this.cognitoUtil.getUserPool()
+            Pool: this.cognitoSession.cognitoUserPool
         };
 
         let cognitoUser = new CognitoUser(userData);
@@ -85,7 +73,7 @@ export class UserLoginService {
     confirmNewPassword(email: string, verificationCode: string, password: string, callback: CognitoCallback) {
         let userData = {
             Username: email,
-            Pool: this.cognitoUtil.getUserPool()
+            Pool: this.cognitoSession.cognitoUserPool
         };
 
         let cognitoUser = new CognitoUser(userData);
@@ -101,32 +89,33 @@ export class UserLoginService {
     }
 
     logout() {
-        console.log("UserLoginService: Logging out");
-        this.ddb.writeLogEntry("logout");
-        this.cognitoUtil.getCurrentUser().signOut();
-
+        let logoutFunc = 
+        this.cognitoSession.getCurrentUser().then( (user:CognitoUser) => {
+            console.log("UserLoginService: Logging out");
+            Promise.resolve(this.ddb.writeLogEntry("logout")).then( () => { user.signOut(); });
+        } );
     }
 
     isAuthenticated(callback: LoggedInCallback) {
-        if (callback == null)
+        if (callback == null) {
             throw("UserLoginService: Callback in isAuthenticated() cannot be null");
-
-        let cognitoUser = this.cognitoUtil.getCurrentUser();
-
-        if (cognitoUser != null) {
-            cognitoUser.getSession(function (err, session) {
-                if (err) {
-                    console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
-                    callback.isLoggedIn(err, false);
-                }
-                else {
-                    console.log("UserLoginService: Session is " + session.isValid());
-                    callback.isLoggedIn(err, session.isValid());
+        } else {
+            this.cognitoSession.getCurrentUser().then( (user:CognitoUser) => {
+                if ( user != null ) {
+                    user.getSession(function (err, session) {
+                        if (err) {
+                            console.log("UserLoginService: Couldn't get the session: " + err, err.stack);
+                            callback.isLoggedIn(err, false);
+                        } else {
+                            console.log("UserLoginService: Session is " + session.isValid());
+                            callback.isLoggedIn(err, session.isValid());
+                        }
+                    });
+                } else {
+                    console.log("UserLoginService: can't retrieve the current user");
+                    callback.isLoggedIn("Can't retrieve the CurrentUser", false);
                 }
             });
-        } else {
-            console.log("UserLoginService: can't retrieve the current user");
-            callback.isLoggedIn("Can't retrieve the CurrentUser", false);
         }
     }
 

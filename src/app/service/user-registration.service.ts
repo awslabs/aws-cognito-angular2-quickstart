@@ -1,6 +1,7 @@
 import {Inject, Injectable} from "@angular/core";
-import {CognitoCallback, CognitoUtil} from "./cognito.service";
+import {CognitoCallback } from "./cognito.service";
 import {AuthenticationDetails, CognitoUser, CognitoUserAttribute} from "amazon-cognito-identity-js";
+import {CognitoSessionService} from "./cognito-session.service";
 import {RegistrationUser} from "../public/auth/register/registration.component";
 import {NewPasswordUser} from "../public/auth/newpassword/newpassword.component";
 import * as AWS from "aws-sdk/global";
@@ -8,7 +9,7 @@ import * as AWS from "aws-sdk/global";
 @Injectable()
 export class UserRegistrationService {
 
-    constructor(@Inject(CognitoUtil) public cognitoUtil: CognitoUtil) {
+    constructor( public cognitoSession: CognitoSessionService) {
 
     }
 
@@ -28,7 +29,7 @@ export class UserRegistrationService {
         attributeList.push(new CognitoUserAttribute(dataEmail));
         attributeList.push(new CognitoUserAttribute(dataNickname));
 
-        this.cognitoUtil.getUserPool().signUp(user.email, user.password, attributeList, null, function (err, result) {
+        this.cognitoSession.cognitoUserPool.signUp(user.email, user.password, attributeList, null, function (err, result) {
             if (err) {
                 callback.cognitoCallback(err.message, null);
             } else {
@@ -43,7 +44,7 @@ export class UserRegistrationService {
 
         let userData = {
             Username: username,
-            Pool: this.cognitoUtil.getUserPool()
+            Pool: this.cognitoSession.cognitoUserPool
         };
 
         let cognitoUser = new CognitoUser(userData);
@@ -60,7 +61,7 @@ export class UserRegistrationService {
     resendCode(username: string, callback: CognitoCallback): void {
         let userData = {
             Username: username,
-            Pool: this.cognitoUtil.getUserPool()
+            Pool: this.cognitoSession.cognitoUserPool
         };
 
         let cognitoUser = new CognitoUser(userData);
@@ -86,7 +87,7 @@ export class UserRegistrationService {
 
         let userData = {
             Username: newPasswordUser.username,
-            Pool: this.cognitoUtil.getUserPool()
+            Pool: this.cognitoSession.cognitoUserPool
         };
 
         console.log("UserLoginService: Params set...Authenticating the user");

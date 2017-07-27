@@ -1,7 +1,6 @@
 import {Injectable} from "@angular/core";
-import {CognitoUtil} from "./cognito.service";
 import {environment} from "../../environments/environment";
-
+import {CognitoSessionService} from "./cognito-session.service";
 import {Stuff} from "../secure/useractivity/useractivity.component";
 import * as AWS from "aws-sdk/global";
 import * as DynamoDB from "aws-sdk/clients/dynamodb";
@@ -13,7 +12,7 @@ import * as DynamoDB from "aws-sdk/clients/dynamodb";
 @Injectable()
 export class DynamoDBService {
 
-    constructor(public cognitoUtil: CognitoUtil) {
+    constructor(public cognitoSession: CognitoSessionService) {
         console.log("DynamoDBService: constructor");
     }
 
@@ -22,40 +21,44 @@ export class DynamoDBService {
     }
 
     getLogEntries(mapArray: Array<Stuff>) {
-        console.log("DynamoDBService: reading from DDB with creds - " + AWS.config.credentials);
-        var params = {
-            TableName: environment.ddbTableName,
-            KeyConditionExpression: "userId = :userId",
-            ExpressionAttributeValues: {
-                ":userId": this.cognitoUtil.getCognitoIdentity()
-            }
-        };
+        this.cognitoSession.getCreds().then( function(creds:AWS.CognitoIdentityCredentials) {
+            console.log("DynamoDBService: reading from DDB with creds - " + AWS.config.credentials);
+            var params = {
+                TableName: environment.ddbTableName,
+                KeyConditionExpression: "userId = :userId",
+                ExpressionAttributeValues: {
+                    ":userId": creds.identityId
+                }
+            };
+            var docClient = new DynamoDB.DocumentClient();
+                docClient.query(params, onQuery);
 
-        var docClient = new DynamoDB.DocumentClient();
-        docClient.query(params, onQuery);
-
-        function onQuery(err, data) {
-            if (err) {
-                console.error("DynamoDBService: Unable to query the table. Error JSON:", JSON.stringify(err, null, 2));
-            } else {
-                // print all the movies
-                console.log("DynamoDBService: Query succeeded.");
-                data.Items.forEach(function (logitem) {
-                    mapArray.push({type: logitem.type, date: logitem.activityDate});
-                });
+                function onQuery(err, data) {
+                    if (err) {
+                        console.error("DynamoDBService: Unable to query the table. Error JSON:", JSON.stringify(err, null, 2));
+                } else {
+                        // print all the movies
+                    console.log("DynamoDBService: Query succeeded.");
+                    data.Items.forEach(function (logitem) {
+                        mapArray.push({type: logitem.type, date: logitem.activityDate});
+                    });
+                }
             }
-        }
+        });
     }
 
     writeLogEntry(type: string) {
-        try {
-            let date = new Date().toString();
-            console.log("DynamoDBService: Writing log entry. Type:" + type + " ID: " + this.cognitoUtil.getCognitoIdentity() + " Date: " + date);
-            this.write(this.cognitoUtil.getCognitoIdentity(), date, type);
-        } catch (exc) {
-            console.log("DynamoDBService: Couldn't write to DDB");
-        }
-
+        var self = this;
+        this.cognitoSession.getCreds().then( function(creds:AWS.CognitoIdentityCredentials) {
+            try {
+                let date = new Date().toString();
+                console.log("DynamoDBService: Writing log entry. Type:" + type + " ID: " + creds.identityId + " Date: " + date);
+                self.write(creds.identityId, date, type);
+            } catch (exc) {
+                console.log("DynamoDBService: Couldn't write to DDB");
+                console.log(exc)
+            }
+        });
     }
 
     write(data: string, date: string, type: string): void {

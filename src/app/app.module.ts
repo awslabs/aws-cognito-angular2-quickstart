@@ -6,10 +6,8 @@ import {AppComponent} from "./app.component";
 import {UserRegistrationService} from "./service/user-registration.service";
 import {UserParametersService} from "./service/user-parameters.service";
 import {UserLoginService} from "./service/user-login.service";
-import {CognitoUtil} from "./service/cognito.service";
 import {routing} from "./app.routes";
 import {AboutComponent, HomeComponent, HomeLandingComponent} from "./public/home.component";
-import {AwsUtil} from "./service/aws.service";
 import {UseractivityComponent} from "./secure/useractivity/useractivity.component";
 import {MyProfileComponent} from "./secure/profile/myprofile.component";
 import {SecureHomeComponent} from "./secure/landing/securehome.component";
@@ -21,6 +19,7 @@ import {ForgotPassword2Component, ForgotPasswordStep1Component} from "./public/a
 import {LogoutComponent, RegistrationConfirmationComponent} from "./public/auth/confirm/confirmRegistration.component";
 import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
 import {NewPasswordComponent} from "./public/auth/newpassword/newpassword.component";
+import {CognitoSessionService} from "./service/cognito-session.service";
 
 
 @NgModule({
@@ -49,12 +48,12 @@ import {NewPasswordComponent} from "./public/auth/newpassword/newpassword.compon
         routing
     ],
     providers: [
-        CognitoUtil,
-        AwsUtil,
         DynamoDBService,
         UserRegistrationService,
         UserLoginService,
-        UserParametersService],
+        UserParametersService,
+        CognitoSessionService
+        ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
