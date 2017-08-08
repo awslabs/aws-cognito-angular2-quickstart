@@ -59,9 +59,6 @@
     "jasmine-spec-reporter": "2.5.0",
     "@types/jasmine": "2.2.30",
     "@types/selenium-webdriver": "2.44.26"
-
   },
-  "devDependencies": {
-
-  }
+  "devDependencies": {}
 }

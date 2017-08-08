@@ -1,11 +1,11 @@
-import {Component, OnInit} from "@angular/core";
+import {Component, OnInit} from '@angular/core';
 
 declare let AWS: any;
 declare let AWSCognito: any;
 
 @Component({
     selector: 'awscognito-angular2-app',
-    template: '<p>Hello and welcome!"</p>'
+    template: '<p>Hello and welcome!</p>'
 })
 export class AboutComponent {
 
@@ -17,7 +17,7 @@ export class AboutComponent {
 })
 export class HomeLandingComponent {
     constructor() {
-        console.log("HomeLandingComponent constructor");
+        console.log('HomeLandingComponent constructor');
     }
 }
 
@@ -28,12 +28,10 @@ export class HomeLandingComponent {
 export class HomeComponent implements OnInit {
 
     constructor() {
-        console.log("HomeComponent constructor");
+        console.log('HomeComponent constructor');
     }
 
     ngOnInit() {
 
     }
 }
-
-
