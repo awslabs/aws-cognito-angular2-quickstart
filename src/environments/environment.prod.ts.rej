@@ -1,0 +1,10 @@
+diff a/src/environments/environment.prod.ts b/src/environments/environment.prod.ts	(rejected hunks)
+@@ -8,7 +8,7 @@ export const environment = {
+   clientId: '3j0fri18fort43ku29up5m655n',
+ 
+   rekognitionBucket: 'rekognition-pics',
+-  albumName: "usercontent",
++  albumName: 'usercontent',
+   bucketRegion: 'eu-west-1',
+ 
+   ddbTableName: 'LoginTrailhostedsolutions',

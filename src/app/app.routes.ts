@@ -1,16 +1,16 @@
-import {RouterModule, Routes} from "@angular/router";
-import {ModuleWithProviders} from "@angular/core";
-import {AboutComponent, HomeComponent, HomeLandingComponent} from "./public/home.component";
-import {SecureHomeComponent} from "./secure/landing/securehome.component";
-import {MyProfileComponent} from "./secure/profile/myprofile.component";
-import {JwtComponent} from "./secure/jwttokens/jwt.component";
-import {UseractivityComponent} from "./secure/useractivity/useractivity.component";
-import {LoginComponent} from "./public/auth/login/login.component";
-import {RegisterComponent} from "./public/auth/register/registration.component";
-import {ForgotPassword2Component, ForgotPasswordStep1Component} from "./public/auth/forgot/forgotPassword.component";
-import {LogoutComponent, RegistrationConfirmationComponent} from "./public/auth/confirm/confirmRegistration.component";
-import {ResendCodeComponent} from "./public/auth/resend/resendCode.component";
-import {NewPasswordComponent} from "./public/auth/newpassword/newpassword.component";
+import {RouterModule, Routes} from '@angular/router';
+import {ModuleWithProviders} from '@angular/core';
+import {AboutComponent, HomeComponent, HomeLandingComponent} from './public/home.component';
+import {SecureHomeComponent} from './secure/landing/securehome.component';
+import {MyProfileComponent} from './secure/profile/myprofile.component';
+import {JwtComponent} from './secure/jwttokens/jwt.component';
+import {UseractivityComponent} from './secure/useractivity/useractivity.component';
+import {LoginComponent} from './public/auth/login/login.component';
+import {RegisterComponent} from './public/auth/register/registration.component';
+import {ForgotPassword2Component, ForgotPasswordStep1Component} from './public/auth/forgot/forgotPassword.component';
+import {LogoutComponent, RegistrationConfirmationComponent} from './public/auth/confirm/confirmRegistration.component';
+import {ResendCodeComponent} from './public/auth/resend/resendCode.component';
+import {NewPasswordComponent} from './public/auth/newpassword/newpassword.component';
 
 const homeRoutes: Routes = [
     {

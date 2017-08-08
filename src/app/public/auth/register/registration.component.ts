@@ -1,7 +1,7 @@
-import {Component} from "@angular/core";
-import {Router} from "@angular/router";
-import {UserRegistrationService} from "../../../service/user-registration.service";
-import {CognitoCallback} from "../../../service/cognito.service";
+import {Component} from '@angular/core';
+import {Router} from '@angular/router';
+import {UserRegistrationService} from '../../../service/user-registration.service';
+import {CognitoCallback} from '../../../service/cognito.service';
 
 export class RegistrationUser {
     name: string;
@@ -37,12 +37,12 @@ export class RegisterComponent implements CognitoCallback {
     }
 
     cognitoCallback(message: string, result: any) {
-        if (message != null) { //error
+        if (message != null) { // error
             this.errorMessage = message;
-            console.log("result: " + this.errorMessage);
-        } else { //success
-            //move to the next step
-            console.log("redirecting");
+            console.log('result: ' + this.errorMessage);
+        } else { // success
+            // move to the next step
+            console.log('redirecting');
             this.router.navigate(['/home/confirmRegistration', result.user.username]);
         }
     }

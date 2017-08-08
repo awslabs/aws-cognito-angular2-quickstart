@@ -1,0 +1,8 @@
+diff a/src/environments/environment.ts b/src/environments/environment.ts	(rejected hunks)
+@@ -9,4 +9,4 @@ export const environment = {
+ 
+   ddbTableName: 'LoginTrailhostedsolutions',
+   apiEndpoint: 'https://5a5qfbsask.execute-api.eu-west-1.amazonaws.com/Prod'
+-};
+\ No newline at end of file
++};
