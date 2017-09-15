@@ -73,7 +73,7 @@ npm run build; cd dist; aws s3 sync . s3://[BUCKET_NAME]/
 ```
 ```
 # Test your deployed application
-curl –I http://[BUCKET_NAME].s3-website-[REGION].amazonaws.com/
+curl –I http://[BUCKET_NAME].s3-website.[REGION].amazonaws.com/
 ```
 __*NOTE: You might want to reshuffle some of the "package.json" dependencies and move the ones that belong to devDependencies 
 for a leaner deployment bundle. At this point of time, AWS Beanstalk requires all of the dependencies, 
