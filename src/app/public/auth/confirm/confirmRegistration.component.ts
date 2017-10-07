@@ -68,8 +68,3 @@ export class RegistrationConfirmationComponent implements OnInit, OnDestroy {
         }
     }
 }
-
-
-
-
-
