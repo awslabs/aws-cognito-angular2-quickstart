@@ -50,6 +50,12 @@ while Elastic Beanstalk gives you the capability of adding backend operations to
 * [What is Elastic Beanstalk](http://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html)
 * [What is S3](http://docs.aws.amazon.com/AmazonS3/latest/dev/Welcome.html)
 
+### Deploy AWS Resources
+There are 2 ways to deploy the required AWS Resources via a shell script or via a CloudFormation template.
+
+*Caution:* You might incur AWS charges after running the setup script
+
+#### Shell Script
 **createResources.sh requires your [aws cli to be configured](http://docs.aws.amazon.com/cli/latest/userguide/controlling-output.html) for JSON output.**
 
 ```
@@ -58,11 +64,32 @@ cd aws
 ./createResources.sh
 ```
 
+**Or deploy in a different region:**
+
+```
+cd aws
+REGION=eu-west-1 ./createResources.sh
+```
+
 Running the above command will create the necessary AWS resources and build & deploy your code to AWS. 
 It will prompt you to choose your deployment target (S3 or Elastic Beanstalk). Choosing 'S3' makes your deployment
 completely serverless, while choosing Elastic Beanstalk will create an EC2 instance that will host this NodeJS app. 
 
-*Caution:* You might incur AWS charges after running the setup script
+#### CloudFormation
+
+**createResourcesCloudFormation.sh**
+
+```
+cd aws
+./createResourcesCloudFormation.sh
+```
+
+**Or deploy in a different region:**
+
+```
+cd aws
+REGION=eu-west-1 ./createResourcesCloudFormation.sh
+```
 
 ## After initially running the ```createResources.sh``` script, use the below commands to rebuild and redeploy
 

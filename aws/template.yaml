@@ -1,0 +1,158 @@
+---
+AWSTemplateFormatVersion: 2010-09-09
+Description: Cognito Angular2 Quickstart, see https://github.com/awslabs/aws-cognito-angular2-quickstart
+Resources:
+
+  WebApp:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      WebsiteConfiguration:
+        ErrorDocument: index.html
+        IndexDocument: index.html
+
+  WebAppPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:  !Ref WebApp
+      PolicyDocument:
+        Statement:
+          - Sid: AllowAccesViaCloudFront
+            Action: s3:GetObject
+            Effect: Allow
+            Resource: !Sub ${WebApp.Arn}/*
+            Principal: "*"
+
+  IdentityPool:
+    Type: AWS::Cognito::IdentityPool
+    Properties:
+      AllowUnauthenticatedIdentities: true
+      CognitoIdentityProviders:
+        - ClientId: !Ref UserPoolClient
+          ProviderName: !GetAtt UserPool.ProviderName
+          ServerSideTokenCheck: true
+
+  IdentityPoolRoleMapping:
+    Type: AWS::Cognito::IdentityPoolRoleAttachment
+    Properties:
+      IdentityPoolId: !Ref IdentityPool
+      Roles:
+        authenticated: !GetAtt AuthenticatedUserRole.Arn
+        unauthenticated: !GetAtt UnauthenticatedUserRole.Arn
+
+  UserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: HostedSolutions
+      Policies:
+        PasswordPolicy:
+          MinimumLength: 8
+          RequireUppercase: true
+          RequireLowercase: true
+          RequireNumbers: true
+          RequireSymbols: true
+      AutoVerifiedAttributes: [ email ]
+
+  UserPoolClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      ClientName: console
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+
+  UnauthenticatedUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: unauthenticated
+      Policies:
+        - PolicyName: CognitoPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: [ "mobileanalytics:PutEvents", "cognito-sync:*" ]
+                Resource: [ "*" ]
+
+  AuthenticatedUserRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: sts:AssumeRoleWithWebIdentity
+            Principal:
+              Federated: cognito-identity.amazonaws.com
+            Condition:
+              StringEquals:
+                cognito-identity.amazonaws.com:aud: !Ref IdentityPool
+              ForAnyValue:StringLike:
+                cognito-identity.amazonaws.com:amr: authenticated
+      Policies:
+        - PolicyName: CognitoPolicy
+          PolicyDocument:
+            Statement:
+              - Effect: Allow
+                Action: [ "mobileanalytics:PutEvents", "cognito-sync:*", "cognito-identity:*" ]
+                Resource: [ "*" ]
+              - Effect: Allow
+                Action: [ "dynamodb:GetItem", "dynamodb:BatchGetItem", "dynamodb:Query", "dynamodb:PutItem", "dynamodb:UpdateItem", "dynamodb:DeleteItem" ]
+                Resource: [ !GetAtt LoginTrail.Arn ]
+                Condition:
+                  ForAllValues:StringEquals:
+                    dynamodb:LeadingKeys:
+                      - ${cognito-identity.amazonaws.com:sub}
+
+  LoginTrail:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: userId
+          AttributeType: S
+        - AttributeName: activityDate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: userId
+          KeyType: HASH
+        - AttributeName: activityDate
+          KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+
+Outputs:
+  IdentityPool:
+    Description: The ID of the Cognito Identity Pool
+    Value: !Ref IdentityPool
+
+  UserPool:
+    Description: The ID of the Cognito user pool
+    Value: !Ref UserPool
+
+  UserPoolClient:
+    Description: The ID of the Cognito Client
+    Value: !Ref UserPoolClient
+
+  LoginTrail:
+    Description: The name of the DynamoDB Table for the LoginTrail
+    Value: !Ref LoginTrail
+
+  WebAppBucket:
+      Description: The bucket name for the web application
+      Value: !Ref WebApp
+
+  WebAppURL:
+    Description: The URL for the web application
+    Value: !GetAtt WebApp.WebsiteURL
