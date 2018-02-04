@@ -1,6 +1,8 @@
 Cognito Quickstart
 ===================================================
 
+[![Join the chat at https://gitter.im/awslabs/aws-cognito-angular-quickstart](https://badges.gitter.im/awslabs/aws-cognito-angular-quickstart.svg)](https://gitter.im/awslabs/aws-cognito-angular-quickstart?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## What does this app do?
 ![QuickStart Angular2 Cognito App](/aws/meta/Cognito-Angular2-QuickStart.png?raw=true)
 
