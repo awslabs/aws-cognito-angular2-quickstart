@@ -9,12 +9,28 @@ echo -n "Enter the name for your resources (must be all lowercase with no spaces
 read ROOT_NAME
 
 BUCKET_NAME=cognitosample-$(echo "$ROOT_NAME" | tr '[:upper:]' '[:lower:]')
+
 TABLE_NAME=LoginTrail$ROOT_NAME
 
 ROLE_NAME_PREFIX=$ROOT_NAME
 POOL_NAME=$ROOT_NAME
 IDENTITY_POOL_NAME=$ROOT_NAME
-REGION=us-east-2
+
+if [ "$AWS_DEFAULT_REGION" = "" ]
+then
+    REGION="$(aws configure get default.region)"
+    if [ "$REGION" = "" ]
+    then
+        echo -n "Enter the region for your resources and press [ENTER]: "
+        read REGION
+    else
+        echo "AWS default region used: $REGION"
+    fi
+else
+    REGION="$AWS_DEFAULT_REGION"
+    echo "Environment variable AWS_DEFAULT_REGION used to set region to $REGION"
+fi
+
 EB_INSTANCE_TYPE=t2.small
 EB_PLATFORM=node.js
 CURR_DIR=$( cd $(dirname $0) ; pwd -P )
