@@ -12,7 +12,7 @@
   "description": "A single-page web app, based on angular4, utilizing Amazon Cognito, S3, and DynamoDB (serverless architecture)",
   "angular-cli": {},
   "scripts": {
-    "start": "ng serve --port 3333",
+    "start": "ng serve --port 3333 --host=0.0.0.0",
     "startnode": "node ./bin/www",
     "lint": "tslint \"src/**/*.ts\"",
     "test": "ng test",
