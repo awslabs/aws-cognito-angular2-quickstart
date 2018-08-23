@@ -107,7 +107,7 @@ createEBResources() {
     verifyEBCLI
 
     # Commit changes made
-    cd $ROOT_DIR
+    cd "$ROOT_DIR"
     npm run-script build
 
     # Create Elastic Beanstalk application
@@ -115,7 +115,7 @@ createEBResources() {
     sleep 1
 
     zip -r upload.zip . -x node_modules/\* *.git* *.idea* *.DS_Store*
-cat <<EOT >> $ROOT_DIR/.elasticbeanstalk/config.yml
+cat <<EOT >> "$ROOT_DIR/.elasticbeanstalk/config.yml"
 deploy:
   artifact: upload.zip
 EOT
@@ -125,7 +125,7 @@ EOT
     # Create Elastic Beanstalk environment
     eb create $ROOT_NAME -d --region $REGION --platform $EB_PLATFORM --instance_type $EB_INSTANCE_TYPE
 
-    cd $CURR_DIR
+    cd "$CURR_DIR"
 }
 
 createS3Bucket() {
@@ -166,7 +166,7 @@ uploadS3Bucket() {
     ng build $( if [ "$aws_cmd" == "awslocal" ]; then echo "--base-href /$BUCKET_NAME/"; fi )
     cd -
     echo "Syncing files to the S3 bucket from " $ROOT_DIR/dist/
-    $aws_cmd s3 sync $ROOT_DIR/dist/ s3://$BUCKET_NAME/  --region $REGION
+    $aws_cmd s3 sync "$ROOT_DIR/dist/" s3://$BUCKET_NAME/  --region $REGION
 }
 
 printConfig() {
@@ -219,7 +219,7 @@ export const environment = {
 };
 
 EOF
-) > $ROOT_DIR/src/environments/environment.ts
+) > "$ROOT_DIR/src/environments/environment.ts"
 
 (
 cat <<EOF
@@ -246,7 +246,7 @@ export const environment = {
 };
 
 EOF
-) > $ROOT_DIR/src/environments/environment.prod.ts
+) > "$ROOT_DIR/src/environments/environment.prod.ts"
 
 }
 
