@@ -7,6 +7,8 @@ Cognito Quickstart
 
 # Note: This repo is deprecated. It was created before the [Amplify SDK](https://aws-amplify.github.io/docs/js/angular) was available which performs a lot of the plumbing for you. Please use the [Amplify SDK](https://aws-amplify.github.io/docs/js/angular) going forward. [Here's an example](https://github.com/vbudilov/reactjs-cognito-starter) of its use with ReactJS as well.
 
+[![Join the chat at https://gitter.im/awslabs/aws-cognito-angular-quickstart](https://badges.gitter.im/awslabs/aws-cognito-angular-quickstart.svg)](https://gitter.im/awslabs/aws-cognito-angular-quickstart?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## What does this app do?
 ![QuickStart Angular2 Cognito App](/aws/meta/Cognito-Angular2-QuickStart.png?raw=true)
 
