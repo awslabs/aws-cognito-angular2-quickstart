@@ -51,6 +51,7 @@ export class AwsUtil {
      *
      * @param isLoggedIn
      * @param callback
+     * @param idToken
      */
     setupAWS(isLoggedIn: boolean, callback: Callback, idToken: string): void {
         console.log("AwsUtil: in setupAWS()");
