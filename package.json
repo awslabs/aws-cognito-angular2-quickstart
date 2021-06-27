@@ -55,7 +55,7 @@
     "karma-cli": "1.0.1",
     "karma-jasmine": "1.0.2",
     "karma-remap-istanbul": "0.6.0",
-    "morgan": "~1.7.0",
+    "morgan": "~1.9.1",
     "protractor": "5.1.1",
     "rxjs": "5.5.4",
     "serve-favicon": "~2.3.0",
